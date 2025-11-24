@@ -285,6 +285,66 @@ dose_every_well/
 
 ---
 
+## Roadmap
+
+### Current Features (v0.7)
+- ✅ Python API for direct hardware control
+- ✅ REST API for remote control
+- ✅ Automated plate loading/unloading
+- ✅ Precision gravimetric measurement
+- ✅ CNC-based solid dosing
+- ✅ Gravimetric verification
+- ✅ Auto-start service on boot
+
+### Planned Features
+
+#### v0.8 - Workflow Implementation & Testing
+- 🔲 Predefined workflow templates
+- 🔲 Custom workflow builder
+- 🔲 Workflow validation and testing
+- 🔲 Batch processing optimization
+- 🔲 Error recovery strategies
+- 🔲 Workflow logging and replay
+
+#### v0.9 - PID Control
+- 🔲 PID controller for gravimetric dosing
+- 🔲 Real-time weight feedback control
+- 🔲 Adaptive dosing based on target
+- 🔲 Flow rate auto-adjustment
+- 🔲 Precision tuning parameters
+- 🔲 Target accuracy improvements
+
+#### v1.0 - Web UI
+- 🔲 Web-based dashboard for system control
+- 🔲 Real-time status monitoring
+- 🔲 Interactive well plate visualization
+- 🔲 Dosing workflow builder interface
+- 🔲 Historical data visualization
+- 🔲 Mobile-responsive design
+
+#### v1.1 - Advanced Features
+- 🔲 WebSocket support for real-time updates
+- 🔲 Job queue for long-running operations
+- 🔲 Database logging of all operations
+- 🔲 User authentication and authorization
+- 🔲 API rate limiting
+- 🔲 Multi-user support
+
+#### v2.0 - Opentrons Integration
+- 🔲 Opentrons OT-2 integration
+- 🔲 Combined liquid + solid workflows
+- 🔲 Unified control interface
+- 🔲 Protocol import/export
+
+#### Future Considerations
+- 🔲 Iterative dosing with feedback control
+- 🔲 Multi-tool support (hot-swappable)
+- 🔲 Cloud data synchronization
+- 🔲 Machine learning for dose optimization
+- 🔲 Integration with LIMS systems
+
+---
+
 ## Contributing
 
 Contributions welcome! Please:

@@ -131,4 +131,4 @@ Documentation contributions are welcome!
 ---
 
 **Last Updated**: January 2025  
-**Package Version**: 1.0.0
+**Package Version**: 0.7.0
