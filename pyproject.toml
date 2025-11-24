@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dose_every_well"
-version = "0.6.0"
-description='Python package that use CNC for liquid handling'
+version = "0.7.0"
+description='Precision weighing and dosing system for microplate automation on Raspberry Pi'
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.8"
@@ -15,7 +15,13 @@ authors = [
 dependencies = [
     "pyserial==3.5",
     "matplotlib==3.10.0",
-    "PyYAML==6.0.2"
+    "PyYAML==6.0.2",
+    "matterlab_balances",
+    "smbus2",
+    # Raspberry Pi dependencies (primary target platform)
+    "adafruit-circuitpython-pca9685",
+    "adafruit-circuitpython-motor",
+    "rpi-lgpio"
 ]
 classifiers = [
     "Development Status :: 1 - Planning",
@@ -31,10 +37,11 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-rpi = [
-    "adafruit-circuitpython-pca9685",
-    "adafruit-circuitpython-motor",
-    "rpi-lgpio"
+# Development on non-Raspberry Pi platforms
+dev = [
+    "pytest",
+    "black",
+    "flake8"
 ]
 
 [tool.setuptools.package-dir]

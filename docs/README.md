@@ -10,6 +10,7 @@ Complete documentation for the Dose Every Well precision dosing system.
 |----------|-------------|
 | **[quick-start.md](quick-start.md)** | Installation, setup, basic usage, and troubleshooting |
 | **[python-api.md](python-api.md)** | Complete Python API reference |
+| **[web-api.md](web-api.md)** | Web service setup and REST API reference |
 | **[architecture.md](architecture.md)** | System design and configuration guide |
 | **[examples.md](examples.md)** | Detailed workflow examples |
 
@@ -29,6 +30,7 @@ Complete documentation for the Dose Every Well precision dosing system.
 ### For Developers
 - [Architecture](architecture.md#design-philosophy) - System design
 - [Python API](python-api.md) - Implementation details
+- [Web API](web-api.md) - REST API and web service
 - [Examples](examples.md) - Usage patterns
 
 ---
@@ -53,6 +55,7 @@ Complete documentation for the Dose Every Well precision dosing system.
 ### API Reference
 - [MicroDoser Class](python-api.md#micodoser)
 - [CNCDosingSystem Class](python-api.md#cncdosingsystem)
+- [REST API Endpoints](web-api.md#api-endpoints)
 - [All Methods](python-api.md#api-reference)
 
 ### Troubleshooting

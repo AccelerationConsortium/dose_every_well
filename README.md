@@ -31,10 +31,21 @@ MicroDoser = Balance + Plate Loader + Optional Dosing System
 
 ### Installation
 
+**On Raspberry Pi 5 (default):**
+
 ```bash
 git clone https://github.com/AccelerationConsortium/dose_every_well.git
 cd dose_every_well
-pip install -e ".[rpi]"  # Include Raspberry Pi dependencies
+
+# Install (includes all Raspberry Pi dependencies by default)
+pip install -e .
+```
+
+**On other platforms (development/testing only):**
+
+```bash
+# Hardware features will not work without Raspberry Pi
+pip install -e .
 ```
 
 ### Standalone Weighing Station
@@ -88,7 +99,8 @@ doser.shutdown()
 ## Features
 
 ### 🎯 High-Level API
-- Simple, intuitive interface for common workflows
+- Simple, intuitive Python interface for common workflows
+- REST API for remote control via HTTP
 - Automatic coordination of all hardware components
 - Built-in gravimetric verification
 
@@ -125,6 +137,7 @@ doser.shutdown()
 |----------|-------------|
 | **[Quick Start](docs/quick-start.md)** | Installation, setup, and basic usage |
 | **[Python API](docs/python-api.md)** | Complete Python API reference |
+| **[Web API](docs/web-api.md)** | REST API service for remote control |
 | **[Architecture & Configuration](docs/architecture.md)** | System design and configuration |
 | **[Examples](docs/examples.md)** | Detailed workflow examples |
 
@@ -150,11 +163,13 @@ python examples/example_calibration.py
 ## Hardware Requirements
 
 ### Core System (Required)
-- Raspberry Pi 5 (or 3/4)
+- **Raspberry Pi 5** (primary target, or Pi 3/4)
 - Sartorius precision balance (USB serial)
 - PCA9685 16-channel PWM HAT (I2C 0x40)
 - 3× Servo motors (plate loader)
 - 5V 5A power supply
+- MicroSD card (32GB+ recommended)
+- Raspberry Pi OS (64-bit recommended)
 
 ### For Automated Solid Dosing (Optional)
 - CNC controller (GRBL-compatible, USB serial)
@@ -249,10 +264,12 @@ dose_every_well/
 
 | Platform | Status | Notes |
 |----------|--------|-------|
-| Raspberry Pi 5 | ✅ Tested | Requires `rpi-lgpio` |
-| Raspberry Pi 3/4 | ✅ Supported | Standard GPIO |
-| Linux (Ubuntu/Debian) | ✅ Supported | For CNC control only |
-| macOS / Windows | ⚠️ Limited | CNC control only |
+| **Raspberry Pi 5** | ✅ **Primary Target** | Full hardware support with `rpi-lgpio` |
+| Raspberry Pi 3/4 | ✅ Supported | Full hardware support with standard GPIO |
+| Linux (Ubuntu/Debian) | ⚠️ Limited | Development/CNC control only |
+| macOS / Windows | ⚠️ Limited | Development/CNC control only |
+
+**Note**: This package is designed for Raspberry Pi hardware. Other platforms can be used for development and CNC control, but full functionality requires Raspberry Pi.
 
 ---
 

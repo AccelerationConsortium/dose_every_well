@@ -8,32 +8,54 @@ Complete guide to installing, configuring, and using MicroDoser.
 
 ### Prerequisites
 
-**Hardware:**
-- Raspberry Pi 5 (or 3/4)
+**Hardware (Required):**
+- **Raspberry Pi 5** (primary target platform)
 - Sartorius balance (USB serial connection)
 - PCA9685 PWM HAT (I2C address 0x40)
-- Plate loader servos
-- (Optional) CNC controller + solid doser for automated dispensing
+- 3× Servo motors (plate loader)
+- 5V 5A power supply
+
+**Optional Hardware:**
+- CNC controller (USB serial) for automated solid dosing
+- 1× Servo motor (gate control)
+- 1× 5V relay module (motor control)
+- 1× DC motor (auger/feeder)
 
 **Software:**
+- Raspberry Pi OS (64-bit recommended)
 - Python 3.8+
 - pip package manager
 
-### Install Package
+### Install on Raspberry Pi 5
 
 ```bash
 # Clone repository
 git clone https://github.com/AccelerationConsortium/dose_every_well.git
 cd dose_every_well
 
-# Install package
+# Install (includes all Raspberry Pi dependencies by default)
 pip install -e .
 
-# For Raspberry Pi hardware support
-pip install -e ".[rpi]"
+# Enable I2C and serial interfaces
+sudo raspi-config
+# Navigate to: Interface Options -> Enable I2C
+# Navigate to: Interface Options -> Enable Serial Port
 
-# For Raspberry Pi 5
-pip install rpi-lgpio
+# Add user to required groups
+sudo usermod -a -G dialout,gpio,i2c $USER
+# Log out and back in for changes to take effect
+```
+
+### Install on Other Platforms (Development Only)
+
+For development/testing on non-Raspberry Pi systems:
+
+```bash
+# Same installation command
+pip install -e .
+
+# Note: Hardware features will not work without Raspberry Pi hardware
+# Some dependencies may fail to install on non-ARM platforms (this is expected)
 ```
 
 ### Verify Installation
