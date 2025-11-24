@@ -1,0 +1,53 @@
+# ============================================================================
+# MicroDoser Configuration - With CNC Dosing System
+# ============================================================================
+# 
+# Full automation mode: Balance + Plate Loader + CNC with Solid Doser
+# Use this for automated solid dispensing workflows with gravimetric verification.
+#
+# Usage:
+#   from dose_every_well import MicroDoser
+#   doser = MicroDoser.from_config('config/with_cnc.yaml')
+#
+# ============================================================================
+
+# Core components (required)
+balance:
+  port: /dev/ttyUSB1
+  type: SartoriusBalance
+
+plate_loader:
+  plate_type: shallow_plate
+  i2c_address: 0x40
+  frequency: 50
+
+# CNC dosing system configuration
+dosing_system:
+  type: CNCDosingSystem
+  params:
+    cnc_port: /dev/ttyUSB0
+    
+    # Solid doser hardware parameters
+    doser_params:
+      i2c_address: 0x40
+      motor_gpio_pin: 17
+      frequency: 50
+    
+    # Well plate geometry
+    well_spacing: 9.0  # mm (standard for 96-well plates)
+    plate_origin: [0.0, 0.0]  # XY coordinates of well A1
+    
+    # Flow rate calibration (update after calibration)
+    # Run: dosing_system.calibrate_flow_rate() to measure
+    flow_rate_mg_per_s: 2.0  # Default estimate, calibrate for accuracy
+
+# Workflow settings
+workflow:
+  auto_tare_on_load: true
+  verify_mass_after_dose: true  # Use balance to verify each dose
+  
+  # Dosing strategy
+  use_iterative_dosing: false  # Future: iteratively dose to hit target
+  max_iterations: 3
+  tolerance_mg: 0.5
+

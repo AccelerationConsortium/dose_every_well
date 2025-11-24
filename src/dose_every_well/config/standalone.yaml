@@ -1,0 +1,33 @@
+# ============================================================================
+# MicroDoser Configuration - Standalone Mode
+# ============================================================================
+# 
+# Standalone mode: Balance + Plate Loader only (no automated dosing)
+# Use this for manual dosing workflows where you control dispensing by hand
+# and the MicroDoser system handles weighing and plate loading.
+#
+# Usage:
+#   from dose_every_well import MicroDoser
+#   doser = MicroDoser.from_config('config/standalone.yaml')
+#
+# ============================================================================
+
+# Core components (required)
+balance:
+  port: /dev/ttyUSB1
+  type: SartoriusBalance
+
+plate_loader:
+  plate_type: shallow_plate
+  # Optional: override default settings
+  # i2c_address: 0x40
+  # frequency: 50
+
+# No dosing system configured
+dosing_system: null
+
+# Workflow settings
+workflow:
+  auto_tare_on_load: true
+  verify_mass_after_dose: false  # No dosing system, so no verification
+

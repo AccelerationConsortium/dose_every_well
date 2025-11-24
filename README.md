@@ -1,315 +1,292 @@
 # Dose Every Well
 
-**Automate liquid and solid powder dispensing into microplates using CNC machines.**
+**Precision weighing and dosing system for microplate automation.**
 
-A Python package for precise control of CNC machines designed for laboratory automation and high-throughput dispensing workflows.
+A Python package for automated gravimetric workflows combining precision weighing, plate handling, and optional CNC or Opentrons integration.
 
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
+[![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%20%7C%20Linux-lightgrey.svg)]()
 
-## Features
+---
 
-### CNC Control
-- Precise G-code control of CNC machines via serial communication
-- Automatic serial port detection across all platforms
-- Pre-configured for Genmitsu 3018-PROVer V2 and 4040 PRO
-- Built-in simulator for testing movements before execution
-- Cross-platform: Windows, Linux, Raspberry Pi, and macOS
-- Safety boundaries to prevent collisions
-- YAML-based configuration for easy machine setup
-- Motorized plate loader with collision avoidance for different plate types
+## What is MicroDoser?
 
-### Raspberry Pi Hardware Support
-- **Motorized Plate Loader** - Automated well plate loading with synchronized servo lift and lid control
-- **Solid Powder Doser** - Precise solid material dispensing with servo gate and DC motor auger
-- **Power-Safe Operation** - Sequential control designed for 5V 5A single-supply operation
-- **Waveshare PCA9685 HAT** - I2C servo control with relay-based motor switching
+**MicroDoser** is a weighing station that can optionally integrate with dosing systems:
+
+```
+MicroDoser = Balance + Plate Loader + Optional Dosing System
+```
+
+### Core Components
+
+- **✅ Sartorius Balance** - Precision gravimetric measurement
+- **✅ Motorized Plate Loader** - Automated plate handling with collision avoidance
+- **⚙️ CNC Dosing System** (optional) - Automated solid dispensing  
+- **⚙️ Opentrons Integration** (future) - Liquid handling support
+
+---
 
 ## Quick Start
 
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/dose_every_well.git
+git clone https://github.com/AccelerationConsortium/dose_every_well.git
 cd dose_every_well
-pip install -e .
+pip install -e ".[rpi]"  # Include Raspberry Pi dependencies
 ```
 
-**For Raspberry Pi hardware support (Plate Loader, Solid Doser):**
+### Standalone Weighing Station
 
-```bash
-# Install with Raspberry Pi dependencies
-pip install -e ".[rpi]"
-
-# For Raspberry Pi 5, also install rpi-lgpio (RPi.GPIO compatibility layer)
-pip install rpi-lgpio
-```
-
-### Basic Usage
+Manual dosing with automated weighing:
 
 ```python
-from dose_every_well import CNC_Controller, load_config, find_port
+from dose_every_well import MicroDoser
 
-# Load configuration and connect
-config = load_config("cnc_settings.yaml", "Genmitsu 4040 PRO")
-controller = CNC_Controller(find_port(), config)
+doser = MicroDoser(
+    balance_port='/dev/ttyUSB1',
+    plate_type='shallow_plate'
+)
 
-# Read position
-coords = controller.read_coordinates()
-print(f"Position: X={coords['X']}, Y={coords['Y']}, Z={coords['Z']}")
-
-# Move to position
-controller.move_to_point(10, 20)  # X=10mm, Y=20mm
-controller.execute_movement()
+doser.load_plate()
+input("Add material, press Enter...")
+mass = doser.read_balance()
+print(f"Mass: {mass * 1000:.2f} mg")
+doser.unload_plate()
+doser.shutdown()
 ```
 
-### Run Demos
+### With CNC Automated Dosing
 
-```bash
-# CNC control demos
-python demo/simple_connect_demo.py
-python demo/axis_movement_demo.py
+Full automation with gravimetric verification:
 
-# Raspberry Pi hardware demos (requires hardware)
-python demo/plate_loader_demo.py
-python demo/solid_doser_demo.py
+```python
+from dose_every_well import MicroDoser, CNCDosingSystem
+
+# Initialize dosing system
+dosing_system = CNCDosingSystem(cnc_port='/dev/ttyUSB0')
+dosing_system.initialize()
+
+# Initialize MicroDoser
+doser = MicroDoser(
+    balance_port='/dev/ttyUSB1',
+    plate_type='shallow_plate',
+    dosing_system=dosing_system
+)
+
+# Dose with verification
+doser.load_plate()
+result = doser.dose_to_well('A1', target_mg=5.0)
+print(f"Target: {result['target_mg']:.2f} mg, Actual: {result['actual_mg']:.2f} mg")
+doser.unload_plate()
+doser.shutdown()
 ```
 
-## Platform Support
+---
 
-| Platform | Status | Notes |
-|----------|--------|-------|
-| Windows 7/10/11 | Supported | Works out of box |
-| Linux (Ubuntu/Debian) | Supported | Requires dialout group |
-| Raspberry Pi 3/4/5 | Supported | Pi 5 requires `rpi-lgpio` |
-| macOS (Intel/M1/M2) | Supported | Full support |
+## Features
+
+### 🎯 High-Level API
+- Simple, intuitive interface for common workflows
+- Automatic coordination of all hardware components
+- Built-in gravimetric verification
+
+### ⚖️ Precision Weighing
+- Sartorius balance integration
+- Automatic taring and measurement
+- mg-level precision
+
+### 🤖 Automated Plate Handling
+- Motorized loading/unloading
+- Collision avoidance for different plate types
+- Configurable via YAML
+
+### 📊 Gravimetric Verification
+- Measure before and after dosing
+- Calculate actual dispensed amount
+- Track dosing accuracy
+
+### 🔧 Flexible Integration
+- Works standalone or with CNC
+- Future-ready for Opentrons
+- Modular architecture
+
+### 📝 Production-Ready
+- Comprehensive error handling
+- Detailed logging
+- Safe shutdown procedures
+
+---
 
 ## Documentation
 
-**[Complete Documentation](docs/)**
+| Document | Description |
+|----------|-------------|
+| **[Quick Start](docs/quick-start.md)** | Installation, setup, and basic usage |
+| **[Python API](docs/python-api.md)** | Complete Python API reference |
+| **[Architecture & Configuration](docs/architecture.md)** | System design and configuration |
+| **[Examples](docs/examples.md)** | Detailed workflow examples |
 
-### General
-- **[Installation Guide](docs/installation.md)** - Platform-specific setup instructions
-- **[Quick Start Guide](docs/quick_start.md)** - Get running in 5 minutes
-- **[API Reference](docs/api_reference.md)** - Complete API documentation
-- **[Troubleshooting](docs/troubleshooting.md)** - Solutions to common issues
+---
 
-### Raspberry Pi Hardware
-- **[Wiring Guide](docs/wiring_guide.md)** - Complete hardware setup with diagrams
-- **[Plate Loader Guide](docs/plate_loader.md)** - Motorized plate loader documentation
-- **[Solid Doser Guide](docs/solid_doser.md)** - Solid powder dosing documentation
-- **[Servo Power Guide](docs/servo_power_guide.md)** - Power management and optimization
+## Examples
 
-## Supported Hardware
-
-### CNC Machines
-- **Genmitsu 4040 PRO** (400×400×75mm work area)
-- **Genmitsu 3018-PROVer V2** (300×180×45mm work area)
-- Any GRBL-compatible CNC machine (requires custom configuration)
-
-### Raspberry Pi Hardware (Optional)
-**Complete system for automated solid/liquid dispensing:**
-
-| Component | Purpose | Channels |
-|-----------|---------|----------|
-| **Waveshare PCA9685 HAT** | I2C servo driver (0x40) | 16 channels |
-| **4× Servo Motors** | Gate, lifts, lid control | Ch 0, 3, 6, 9 |
-| **5V Relay Module** | DC motor ON/OFF | GPIO 17 |
-| **DC Motor** | Auger/screw feeder | Via relay |
-| **5V 5A Power Supply** | Single plug powers all | USB-C + distribution |
-
-**See [Wiring Guide](docs/wiring_guide.md) for complete setup instructions**
-
-### Plate Loader (Raspberry Pi)
-
-Motorized plate loader with automatic collision avoidance for safe operation with different plate types:
-
-```python
-from dose_every_well import PlateLoader
-
-# Specify plate type for automatic safety settings
-loader = PlateLoader(plate_type='shallow_plate')  # 96-well plates
-loader = PlateLoader(plate_type='deep_well')      # Deep-well plates
-
-# Operate safely with collision avoidance
-loader.open_lid()
-loader.raise_plate()
-loader.close_lid()  # Auto-blocked if plate position would cause collision
-
-# Switch plate types on the fly
-loader.set_plate_type('custom_384_well')
-loader.reload_config()  # Reload settings from plate_settings.yaml
-```
-
-**Features:**
-- **Collision Avoidance** - Prevents lid-plate crashes based on plate type
-- **YAML Configuration** - Customize plate types in `plate_settings.yaml`
-- **Hot-Reload** - Update settings without restarting
-- **Multiple Plate Types** - Pre-configured for shallow, deep-well, and custom plates
-
-Requires Raspberry Pi with PCA9685 PWM HAT and servos. See `plate_settings.yaml` for configuration.
-
-## Testing
-
-Verify your setup works correctly:
+Pre-built example scripts in `examples/`:
 
 ```bash
-python test_platform.py
+# Standalone weighing
+python examples/example_standalone.py
+
+# CNC automated dosing
+python examples/example_with_cnc.py
+
+# Calibrate flow rate
+python examples/example_calibration.py
 ```
+
+---
+
+## Hardware Requirements
+
+### Core System (Required)
+- Raspberry Pi 5 (or 3/4)
+- Sartorius precision balance (USB serial)
+- PCA9685 16-channel PWM HAT (I2C 0x40)
+- 3× Servo motors (plate loader)
+- 5V 5A power supply
+
+### For Automated Solid Dosing (Optional)
+- CNC controller (GRBL-compatible, USB serial)
+- 1× Servo motor (gate control)
+- 1× 5V relay module (motor control)
+- 1× DC motor (auger/feeder)
+
+### For Liquid Handling (Future)
+- Opentrons OT-2 robot
+- Network connection
+
+---
+
+## System Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│                  MicroDoser                     │
+│  (High-level orchestration & coordination)      │
+└────────┬────────────────────────┬───────────────┘
+         │                        │
+    ┌────▼─────┐           ┌──────▼────────┐
+    │  Core    │           │    Optional    │
+    │Components│           │ Dosing System  │
+    └────┬─────┘           └────────┬───────┘
+         │                          │
+    ┌────▼─────────┐         ┌──────▼────────────┐
+    │  Balance     │         │  CNCDosingSystem  │
+    │  (Sartorius) │         │  (CNC + Solid     │
+    ├──────────────┤         │   Doser)          │
+    │ Plate Loader │         └───────────────────┘
+    │ (PCA9685 +   │         
+    │  3 Servos)   │         
+    └──────────────┘         
+```
+
+---
 
 ## Project Structure
 
 ```
 dose_every_well/
-├── src/dose_every_well/       # Main package
-│   ├── cnc_controller.py      # Core CNC controller
-│   ├── plate_loader.py        # Raspberry Pi plate loader (3 servos)
-│   ├── solid_doser.py         # Raspberry Pi solid doser (servo + motor)
-│   ├── cnc_settings.yaml      # CNC machine configs
-│   ├── plate_settings.yaml    # Plate loader configs
-│   └── __init__.py
-├── demo/                       # Example scripts
-│   ├── simple_connect_demo.py
-│   ├── axis_movement_demo.py
-│   ├── plate_loader_demo.py
-│   └── solid_doser_demo.py
 ├── docs/                       # Documentation
-│   ├── wiring_guide.md        # Hardware setup (START HERE!)
-│   ├── solid_doser.md
-│   ├── plate_loader.md
-│   ├── installation.md
-│   └── troubleshooting.md
-├── test_platform.py           # Platform compatibility test
-└── README.md                  # This file
+│   ├── getting-started.md      # Installation & setup
+│   ├── api-reference.md        # Complete API docs
+│   ├── configuration.md        # Config guide
+│   ├── examples.md             # Example workflows
+│   └── architecture.md         # System design
+│
+├── examples/                   # Example scripts
+│   ├── example_standalone.py   # Weighing station
+│   ├── example_with_cnc.py     # Automated dosing
+│   └── example_calibration.py  # Calibration
+│
+├── src/dose_every_well/        # Main package
+│   ├── core.py                 # MicroDoser class
+│   ├── dosing_system.py        # CNCDosingSystem
+│   ├── config/                 # YAML configs
+│   │   ├── standalone.yaml
+│   │   └── with_cnc.yaml
+│   ├── cnc_controller.py       # CNC control
+│   ├── plate_loader.py         # Plate loader
+│   ├── solid_doser.py          # Solid doser
+│   └── sartorius_balance.py    # Balance
+│
+└── README.md                   # This file
 ```
+
+---
+
+## Use Cases
+
+### 1. Manual Dosing + Automated Weighing
+- User doses materials by hand
+- System handles plate loading and weighing
+- Ideal for method development
+
+### 2. Fully Automated Solid Dosing
+- CNC positions over wells
+- Solid doser dispenses material
+- Balance verifies each dose
+- Ideal for high-throughput workflows
+
+### 3. Liquid + Solid Workflows (Future)
+- Opentrons handles liquids
+- MicroDoser verifies masses
+- Combined liquid/solid experiments
+
+---
+
+## Platform Support
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| Raspberry Pi 5 | ✅ Tested | Requires `rpi-lgpio` |
+| Raspberry Pi 3/4 | ✅ Supported | Standard GPIO |
+| Linux (Ubuntu/Debian) | ✅ Supported | For CNC control only |
+| macOS / Windows | ⚠️ Limited | CNC control only |
+
+---
 
 ## Safety
 
 **Important Safety Practices:**
 
-- Test in simulation before hardware execution
-- Verify movement boundaries match your machine
-- Keep emergency stop accessible during operation
-- Clear work area before automated runs
-- Monitor Z-axis movements to prevent crashes
+- ✅ Test in simulation before hardware execution
+- ✅ Verify movement boundaries match your machine
+- ✅ Keep emergency stop accessible
+- ✅ Clear work area before automated runs
+- ✅ Monitor first runs carefully
 
-## Usage Examples
-
-### Example 1: CNC-Only Liquid Dispensing
-
-```python
-from dose_every_well import CNC_Controller, load_config, find_port
-
-# Setup
-config = load_config("cnc_settings.yaml", "Genmitsu 4040 PRO")
-controller = CNC_Controller(find_port(), config)
-
-# 96-well plate parameters
-well_spacing = 9.0  # mm
-start_x, start_y = 10.0, 10.0
-dispense_height = 5.0
-
-# Visit each well
-for row in range(8):  # A-H
-    for col in range(12):  # 1-12
-        x = start_x + col * well_spacing
-        y = start_y + row * well_spacing
-        
-        controller.move_to_point(x, y)
-        controller.move_to_height(dispense_height)
-        controller.execute_movement()
-        
-        print(f"Dispensing to well {chr(65+row)}{col+1}")
-```
-
-### Example 2: Complete Solid Dosing Workflow (Raspberry Pi)
-
-```python
-from dose_every_well import CNC_Controller, PlateLoader, SolidDoser, load_config, find_port
-import time
-
-# Initialize all controllers
-cnc = CNC_Controller(find_port(), load_config("cnc_settings.yaml", "Genmitsu 4040 PRO"))
-plate_loader = PlateLoader(i2c_address=0x40)
-solid_doser = SolidDoser(i2c_address=0x40, motor_gpio_pin=17)
-
-try:
-    # 1. Load plate onto balance
-    print("Loading plate...")
-    plate_loader.load_sequence()
-    
-    # 2. Dispense solid into each well
-    well_spacing = 9.0  # mm
-    start_x, start_y = 10.0, 10.0
-    
-    for row in range(8):
-        for col in range(12):
-            well = f"{chr(65+row)}{col+1}"
-            print(f"Dispensing to well {well}...")
-            
-            # Move CNC to well position
-            x = start_x + col * well_spacing
-            y = start_y + row * well_spacing
-            cnc.move_to_point(x, y)
-            cnc.move_to_height(5.0)
-            cnc.execute_movement()
-            
-            # Dispense solid material (motor + gate servo)
-            solid_doser.dispense(duration=2.0)
-            
-            # Move up
-            cnc.move_to_height(20.0)
-            cnc.execute_movement()
-    
-    # 3. Unload plate
-    print("Unloading plate...")
-    plate_loader.unload_sequence()
-    
-finally:
-    solid_doser.shutdown()
-    plate_loader.shutdown()
-    cnc.disconnect()
-```
-
-### Example 3: Solid Doser Only (No CNC)
-
-```python
-from dose_every_well import SolidDoser
-
-doser = SolidDoser(i2c_address=0x40, motor_gpio_pin=17)
-
-try:
-    # Simple dispense for 5 seconds
-    doser.dispense(duration=5.0)
-    
-    # Precise low-flow dispense (30° gate opening)
-    doser.dispense(duration=3.0, gate_angle=30)
-    
-finally:
-    doser.shutdown()
-```
+---
 
 ## Contributing
 
-Contributions are welcome! Please:
+Contributions welcome! Please:
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Run `python test_platform.py` to verify
+4. Test thoroughly
 5. Submit a pull request
 
 For major changes, open an issue first to discuss.
+
+---
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Author
-
-**Yang Cao**
-- Email: yangcyril.cao@utoronto.ca
+---
 
 ## Citation
 
@@ -318,15 +295,24 @@ If you use this package in your research, please cite:
 ```bibtex
 @software{dose_every_well,
   author = {Cao, Yang},
-  title = {Dose Every Well: CNC-based Automated Dispensing},
+  title = {Dose Every Well: Precision Dosing and Weighing System},
   year = {2025},
   url = {https://github.com/AccelerationConsortium/dose_every_well}
 }
 ```
 
+---
+
+## Author
+
+**Yang Cao**  
+Email: yangcyril.cao@utoronto.ca
+
+---
+
 ## Acknowledgments
 
-Built for laboratory automation workflows with a focus on microplate dispensing applications. Uses GRBL firmware for CNC control.
+Built for laboratory automation workflows with a focus on microplate gravimetric applications.
 
 ---
 
